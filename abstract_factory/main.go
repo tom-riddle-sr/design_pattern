@@ -1,155 +1,74 @@
 package main
 
-// ========== 產品介面 ==========
-type IButton interface {
-	Render() string
-	GetStyle() string
+type Drink interface {
+	Serve() string
+	AddIce() string
+	SetTemp() string
 }
 
-type ITextField interface {
-	Render() string
-	GetBorder() string
+type Coffee struct{}
+
+func (c *Coffee) Serve() string {
+	return "Serving a cup of Coffee"
 }
 
-type ICheckBox interface {
-	Render() string
-	GetShape() string
+func (c *Coffee) AddIce() string {
+	return "Adding ice to Coffee"
 }
 
-// ========== 工廠介面 ==========
-type IGUIFactory interface {
-	GetButton() IButton
-	GetTextField() ITextField
-	GetCheckBox() ICheckBox
+func (c *Coffee) SetTemp() string {
+	return "Setting Coffee temperature to hot"
 }
 
-// ========== Windows 產品族 ==========
-type WindowsButton struct{}
+type Tea struct{}
 
-func (b *WindowsButton) Render() string {
-	return "Rendering Windows Button"
+func (t *Tea) Serve() string {
+	return "Serving a cup of Tea"
 }
 
-func (b *WindowsButton) GetStyle() string {
-	return "Square Style"
+func (t *Tea) AddIce() string {
+	return "Adding ice to Tea"
 }
 
-type WindowsTextField struct{}
-
-func (t *WindowsTextField) Render() string {
-	return "Rendering Windows TextField"
+func (t *Tea) SetTemp() string {
+	return "Setting Tea temperature to warm"
 }
 
-func (t *WindowsTextField) GetBorder() string {
-	return "Single Line Border"
+type DrinkFactory interface {
+	CreateDrink() Drink
 }
 
-type WindowsCheckBox struct{}
+type CoffeeFactory struct{}
 
-func (c *WindowsCheckBox) Render() string {
-	return "Rendering Windows CheckBox"
+func (f *CoffeeFactory) CreateDrink() Drink {
+	return &Coffee{}
 }
 
-func (c *WindowsCheckBox) GetShape() string {
-	return "Square Shape"
+type TeaFactory struct{}
+
+func (f *TeaFactory) CreateDrink() Drink {
+	return &Tea{}
 }
 
-// ========== Windows 工廠 ==========
-type WindowsGUI struct{}
-
-func (f *WindowsGUI) GetButton() IButton {
-	return &WindowsButton{}
-}
-
-func (f *WindowsGUI) GetTextField() ITextField {
-	return &WindowsTextField{}
-}
-
-func (f *WindowsGUI) GetCheckBox() ICheckBox {
-	return &WindowsCheckBox{}
-}
-
-// ========== MacOS 產品族 ==========
-type MacOSButton struct{}
-
-func (b *MacOSButton) Render() string {
-	return "Rendering MacOS Button"
-}
-
-func (b *MacOSButton) GetStyle() string {
-	return "Rounded Style"
-}
-
-type MacOSTextField struct{}
-
-func (t *MacOSTextField) Render() string {
-	return "Rendering MacOS TextField"
-}
-
-func (t *MacOSTextField) GetBorder() string {
-	return "Rounded Border"
-}
-
-type MacOSCheckBox struct{}
-
-func (c *MacOSCheckBox) Render() string {
-	return "Rendering MacOS CheckBox"
-}
-
-func (c *MacOSCheckBox) GetShape() string {
-	return "Circle Shape"
-}
-
-// ========== MacOS 工廠 ==========
-type MacOSGUI struct{}
-
-func (f *MacOSGUI) GetButton() IButton {
-	return &MacOSButton{}
-}
-
-func (f *MacOSGUI) GetTextField() ITextField {
-	return &MacOSTextField{}
-}
-
-func (f *MacOSGUI) GetCheckBox() ICheckBox {
-	return &MacOSCheckBox{}
-}
-
-// ========== 工廠選擇器 ==========
-func FactoryOS(os string) IGUIFactory {
-	switch os {
-	case "Windows":
-		return &WindowsGUI{}
-	case "MacOS":
-		return &MacOSGUI{}
-	default:
-		return nil
+func GetDrinkFactory(drinkType string) DrinkFactory {
+	if drinkType == "coffee" {
+		return &CoffeeFactory{}
+	} else if drinkType == "tea" {
+		return &TeaFactory{}
 	}
+	return nil
 }
 
-// ========== 客戶端使用 ==========
 func main() {
-	// Windows 風格
-	windowsFactory := FactoryOS("Windows")
-	println("=== Windows UI ===")
-	btn := windowsFactory.GetButton()
-	println(btn.Render(), "-", btn.GetStyle())
+	coffeeFactory := GetDrinkFactory("coffee")
+	coffee := coffeeFactory.CreateDrink()
+	println(coffee.Serve())
+	println(coffee.AddIce())
+	println(coffee.SetTemp())
 
-	txt := windowsFactory.GetTextField()
-	println(txt.Render(), "-", txt.GetBorder())
-
-	chk := windowsFactory.GetCheckBox()
-	println(chk.Render(), "-", chk.GetShape())
-
-	// MacOS 風格
-	macFactory := FactoryOS("MacOS")
-	println("\n=== MacOS UI ===")
-	btn2 := macFactory.GetButton()
-	println(btn2.Render(), "-", btn2.GetStyle())
-
-	txt2 := macFactory.GetTextField()
-	println(txt2.Render(), "-", txt2.GetBorder())
-
-	chk2 := macFactory.GetCheckBox()
-	println(chk2.Render(), "-", chk2.GetShape())
+	teaFactory := GetDrinkFactory("tea")
+	tea := teaFactory.CreateDrink()
+	println(tea.Serve())
+	println(tea.AddIce())
+	println(tea.SetTemp())
 }
